@@ -34,6 +34,33 @@ class RainbowSineWaveVisualizer {
         // Button event listeners
         this.startBtn.addEventListener('click', () => this.start());
         this.stopBtn.addEventListener('click', () => this.stop());
+        
+        // Add demo mode button if in testing environment
+        this.addDemoMode();
+    }
+    
+    addDemoMode() {
+        const demoBtn = document.createElement('button');
+        demoBtn.id = 'demoBtn';
+        demoBtn.className = 'btn';
+        demoBtn.textContent = 'Demo Mode';
+        demoBtn.style.background = 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)';
+        
+        this.startBtn.parentElement.appendChild(demoBtn);
+        
+        demoBtn.addEventListener('click', () => this.startDemoMode());
+    }
+    
+    startDemoMode() {
+        this.updateStatus('✨ Demo mode active - Simulating audio input ✨');
+        this.startBtn.disabled = true;
+        this.stopBtn.disabled = false;
+        document.getElementById('demoBtn').disabled = true;
+        
+        // Simulate audio data
+        this.demoMode = true;
+        this.time = 0;
+        this.animateDemo();
     }
     
     resizeCanvas() {
@@ -105,12 +132,17 @@ class RainbowSineWaveVisualizer {
             this.microphone.mediaStream.getTracks().forEach(track => track.stop());
         }
         
+        // Clear demo mode
+        this.demoMode = false;
+        
         // Clear canvas
         this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
         
         // Update UI
         this.startBtn.disabled = false;
         this.stopBtn.disabled = true;
+        const demoBtn = document.getElementById('demoBtn');
+        if (demoBtn) demoBtn.disabled = false;
         this.updateStatus('Click "Start Visualizer" to begin');
     }
     
@@ -119,6 +151,13 @@ class RainbowSineWaveVisualizer {
     }
     
     getAudioData() {
+        if (this.demoMode) {
+            // Simulate varying audio data
+            const avgAmplitude = 0.3 + Math.sin(this.time * 0.5) * 0.2 + Math.random() * 0.1;
+            const freqInfluence = 0.4 + Math.cos(this.time * 0.3) * 0.2 + Math.random() * 0.1;
+            return { avgAmplitude, freqInfluence };
+        }
+        
         this.analyser.getByteTimeDomainData(this.dataArray);
         
         // Calculate average amplitude
@@ -189,6 +228,47 @@ class RainbowSineWaveVisualizer {
         const { avgAmplitude, freqInfluence } = this.getAudioData();
         
         // Calculate responsive amplitude based on audio input
+        const responsiveAmplitude = this.baseAmplitude + (avgAmplitude * 150);
+        const responsiveFrequency = 2 + (freqInfluence * 3);
+        
+        // Draw multiple rainbow sine waves
+        for (let i = 0; i < this.waveCount; i++) {
+            const offset = (i / this.waveCount) * Math.PI * 2;
+            const color = this.getRainbowColor(i, this.waveCount);
+            const alpha = 0.6 + (avgAmplitude * 0.4);
+            
+            // Add slight variation to each wave
+            const waveAmplitude = responsiveAmplitude * (0.8 + Math.sin(this.time * 0.5 + offset) * 0.2);
+            const waveFrequency = responsiveFrequency * (0.9 + Math.cos(this.time * 0.3 + offset) * 0.1);
+            
+            this.drawSineWave(offset, waveAmplitude, waveFrequency, color, alpha);
+        }
+        
+        // Add glow effect for the center line
+        this.ctx.shadowBlur = 20 + (avgAmplitude * 30);
+        this.ctx.shadowColor = 'rgba(255, 255, 255, 0.5)';
+        
+        // Draw a brighter central wave
+        const centerColor = this.getRainbowColor(this.time * 10, 360);
+        this.drawSineWave(0, responsiveAmplitude * 0.5, responsiveFrequency, centerColor, 1);
+        
+        this.ctx.shadowBlur = 0;
+        
+        // Increment time for animation
+        this.time += this.waveSpeed;
+    }
+    
+    animateDemo() {
+        this.animationId = requestAnimationFrame(() => this.animateDemo());
+        
+        // Clear canvas with slight trail effect
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+        this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
+        
+        // Get simulated audio data
+        const { avgAmplitude, freqInfluence } = this.getAudioData();
+        
+        // Calculate responsive amplitude based on simulated audio input
         const responsiveAmplitude = this.baseAmplitude + (avgAmplitude * 150);
         const responsiveFrequency = 2 + (freqInfluence * 3);
         
