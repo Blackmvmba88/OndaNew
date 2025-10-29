@@ -217,9 +217,7 @@ class RainbowSineWaveVisualizer {
         this.ctx.globalAlpha = 1;
     }
     
-    animate() {
-        this.animationId = requestAnimationFrame(() => this.animate());
-        
+    renderWaves() {
         // Clear canvas with slight trail effect
         this.ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
         this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
@@ -258,45 +256,14 @@ class RainbowSineWaveVisualizer {
         this.time += this.waveSpeed;
     }
     
+    animate() {
+        this.animationId = requestAnimationFrame(() => this.animate());
+        this.renderWaves();
+    }
+    
     animateDemo() {
         this.animationId = requestAnimationFrame(() => this.animateDemo());
-        
-        // Clear canvas with slight trail effect
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
-        this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
-        
-        // Get simulated audio data
-        const { avgAmplitude, freqInfluence } = this.getAudioData();
-        
-        // Calculate responsive amplitude based on simulated audio input
-        const responsiveAmplitude = this.baseAmplitude + (avgAmplitude * 150);
-        const responsiveFrequency = 2 + (freqInfluence * 3);
-        
-        // Draw multiple rainbow sine waves
-        for (let i = 0; i < this.waveCount; i++) {
-            const offset = (i / this.waveCount) * Math.PI * 2;
-            const color = this.getRainbowColor(i, this.waveCount);
-            const alpha = 0.6 + (avgAmplitude * 0.4);
-            
-            // Add slight variation to each wave
-            const waveAmplitude = responsiveAmplitude * (0.8 + Math.sin(this.time * 0.5 + offset) * 0.2);
-            const waveFrequency = responsiveFrequency * (0.9 + Math.cos(this.time * 0.3 + offset) * 0.1);
-            
-            this.drawSineWave(offset, waveAmplitude, waveFrequency, color, alpha);
-        }
-        
-        // Add glow effect for the center line
-        this.ctx.shadowBlur = 20 + (avgAmplitude * 30);
-        this.ctx.shadowColor = 'rgba(255, 255, 255, 0.5)';
-        
-        // Draw a brighter central wave
-        const centerColor = this.getRainbowColor(this.time * 10, 360);
-        this.drawSineWave(0, responsiveAmplitude * 0.5, responsiveFrequency, centerColor, 1);
-        
-        this.ctx.shadowBlur = 0;
-        
-        // Increment time for animation
-        this.time += this.waveSpeed;
+        this.renderWaves();
     }
 }
 
