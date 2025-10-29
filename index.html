@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Real-time rainbow sine wave audio visualizer using Web Audio API">
+    <title>Rainbow Sine Wave Audio Visualizer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 Rainbow Sine Wave Visualizer 🌈</h1>
+        <p class="description">Experience your voice as a living rainbow wave</p>
+        
+        <div class="controls">
+            <button id="startBtn" class="btn">Start Visualizer</button>
+            <button id="stopBtn" class="btn" disabled>Stop Visualizer</button>
+        </div>
+        
+        <div class="status" id="status">Click "Start Visualizer" to begin</div>
+        
+        <canvas id="visualizer"></canvas>
+    </div>
+    
+    <script src="visualizer.js"></script>
+</body>
+</html>
