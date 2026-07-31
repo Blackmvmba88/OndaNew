@@ -78,4 +78,5 @@ Open source - feel free to use and modify!
 
 ## 👤 Author
 
-Created by Vianey (Blackmvmba88)
+Created by Iyari Gomez
+(Blackmvmba88)
